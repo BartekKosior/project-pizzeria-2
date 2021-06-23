@@ -57,8 +57,12 @@
       const thisProduct = this;
       thisProduct.id = id;
       thisProduct.data = data;    /* data zawiera wszystkie właściwości produktu (name, price, desctription) */
-      thisProduct.renderInMenu();
-      thisProduct.initAccordion();
+      thisProduct.renderInMenu();  /* uruchomienie metody */
+      thisProduct.getElements();
+      thisProduct.initAccordion();  /* uruchomienie metody */
+      thisProduct.initOrderForm();
+      thisProduct.processOrder();
+
       console.log('new Product:', thisProduct);
     }
     renderInMenu(){
@@ -73,25 +77,67 @@
       menuContainer.appendChild(thisProduct.element);
     }
 
+    
+    getElements(){    /* metoda do znalezienia elementów w kontenerze produktu ; swego rodzaju spis treści */
+      const thisProduct = this;
+      
+      thisProduct.accordionTrigger = thisProduct.element.querySelector(select.menuProduct.clickable);
+      thisProduct.form = thisProduct.element.querySelector(select.menuProduct.form);
+      thisProduct.formInputs = thisProduct.form.querySelectorAll(select.all.formInputs);
+      thisProduct.cartButton = thisProduct.element.querySelector(select.menuProduct.cartButton);
+      thisProduct.priceElem = thisProduct.element.querySelector(select.menuProduct.priceElem);
+    }
+
+
     initAccordion(){
       const thisProduct = this;
       /* find the clickable trigger (the element that should react to clicking) */
-      const clickableTrigger = document.querySelectorAll(select.menuProduct.clickable);
-
+      const clickableTrigger = thisProduct.element.querySelector(select.menuProduct.clickable);
       /* START: add event listener to clickable trigger on event click */
       clickableTrigger.addEventListener('click', function(event) {
         /* prevent default action for event */
         event.preventDefault();
         /* find active product (product that has active class) */
-        
+        const activeProduct = document.querySelector('.active.product');   /* musi miec obie klasy */
         /* if there is active product and it's not thisProduct.element, remove class active from it */
-
-        /* toggle active class on thisProduct.element */
+        if(activeProduct != thisProduct.element && activeProduct){  /* jezeli aktywny elem jest inny niz klikniety elem i w ogole istnieje to schowaj go */
+          activeProduct.classList.remove('active');
+        }
+        /* toggle active class on thisProduct.element */ /* przełączenie klasy active */
+        thisProduct.element.classList.toggle('active');
       });
-
     }
     
 
+    initOrderForm(){
+      const thisProduct = this;
+      console.log('initOrderForm:');
+      thisProduct.form.addEventListener('submit', function(event){
+        event.preventDefault();
+        thisProduct.processOrder();
+      });
+      
+      for(let input of thisProduct.formInputs){
+        input.addEventListener('change', function(){
+          thisProduct.processOrder();
+        });
+      }
+      
+      thisProduct.cartButton.addEventListener('click', function(event){
+        event.preventDefault();
+        thisProduct.processOrder();
+      });
+    }
+    
+    
+    processOrder(){
+      const thisProduct = this;
+      console.log('processOrder:');
+      const formData = utils.serializeFormToObject(thisProduct.form);
+      console.log('formData', formData);
+
+
+    }
 
 
   }
@@ -126,5 +172,5 @@
     },
   };
 
-  app.init();     /* czemu wywołanie app.init poza app ? */
+  app.init();    
 }
