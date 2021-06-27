@@ -92,9 +92,10 @@
     initAccordion(){
       const thisProduct = this;
       /* find the clickable trigger (the element that should react to clicking) */
-      const clickableTrigger = thisProduct.element.querySelector(select.menuProduct.clickable);
+      /* const clickableTrigger = thisProduct.element.querySelector(select.menuProduct.clickable);    /* zbędna linijka */
       /* START: add event listener to clickable trigger on event click */
-      clickableTrigger.addEventListener('click', function(event) {
+      /* clickableTrigger.addEventListener('click', function(event) {     clickableTrigger mozna zastapic 'thisProduct.accordionTrigger */     
+      thisProduct.accordionTrigger.addEventListener('click', function(event) {
         /* prevent default action for event */
         event.preventDefault();
         /* find active product (product that has active class) */
@@ -112,34 +113,62 @@
     initOrderForm(){
       const thisProduct = this;
       console.log('initOrderForm:');
+
       thisProduct.form.addEventListener('submit', function(event){
-        event.preventDefault();
-        thisProduct.processOrder();
+        event.preventDefault();  /* blokowanie wysłanie formularza z przeładowaniem strony */
+        thisProduct.processOrder(); /* obliczenie ceny produktu */
       });
       
       for(let input of thisProduct.formInputs){
         input.addEventListener('change', function(){
-          thisProduct.processOrder();
+          thisProduct.processOrder();  /* obliczenie ceny produktu */
         });
       }
       
       thisProduct.cartButton.addEventListener('click', function(event){
-        event.preventDefault();
-        thisProduct.processOrder();
+        event.preventDefault(); /* blokowanie zmiany adresu strony po kliknięciu w link */
+        thisProduct.processOrder();  /* obliczenie ceny produktu */
       });
     }
-    
-    
+        
     processOrder(){
       const thisProduct = this;
       console.log('processOrder:');
+      // covert form to object structure e.g. { sauce: ['tomato'], toppings: ['olives', 'redPeppers']}  Dostęp do formularza
       const formData = utils.serializeFormToObject(thisProduct.form);
       console.log('formData', formData);
 
+      // set price to default price      zapisanie startowej ceny produktu do zmiennej 
+      let price = thisProduct.data.price;
 
+      // for every category (param)...
+      for(let paramId in thisProduct.data.params) {
+        // determine param value, e.g. paramId = 'toppings', param = { label: 'Toppings', type: 'checkboxes'... }
+        const param = thisProduct.data.params[paramId]; // pętla for..in zwraca tylko nazwę właśc. Ta linijka dba o to, aby dostać się do całego obiektu dost. pod tą właśc.
+        console.log(paramId, param);
+        // for every option in this category
+        for(let optionId in param.options) {
+          // determine option value, e.g. optionId = 'olives', option = { label: 'Olives', price: 2, default: true }
+          const option = param.options[optionId];    // dostanie się do całego obiektu dost. pod tą właśc.
+          console.log(optionId, option);
+
+          // check if there is param with a name of paramId in formData and if it includes optionId
+          if(formData[paramId] && formData[paramId].includes(optionId)) {
+            // check if the option is not default - sprawdz czy opcja nie jest domyslna
+            if(        ) {
+              // add option price to price variable
+            }
+          } else {
+            // check if the option is default - sprawdz czy opcja jest domyslna
+            if(         ) {
+              // reduce price variable
+            }     
+          }
+        }
+      }
+      // update calculated price in the HTML
+      thisProduct.priceElem.innerHTML = price;  // wpisanie przeliczonej ceny do elementu w HTML-u:
     }
-
-
   }
 
 
