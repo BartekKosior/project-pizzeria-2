@@ -86,6 +86,7 @@
       thisProduct.formInputs = thisProduct.form.querySelectorAll(select.all.formInputs);
       thisProduct.cartButton = thisProduct.element.querySelector(select.menuProduct.cartButton);
       thisProduct.priceElem = thisProduct.element.querySelector(select.menuProduct.priceElem);
+      thisProduct.imageWrapper = thisProduct.element.querySelector(select.menuProduct.imageWrapper);                                   /* czy jest ok ?????????? */
     }
 
 
@@ -153,19 +154,30 @@
           console.log(optionId, option);
 
           // check if there is param with a name of paramId in formData and if it includes optionId
-          if(formData[paramId] && formData[paramId].includes(optionId)) {
+          
+          if(formData[paramId] && formData[paramId].includes(optionId)) {          
             // check if the option is not default - sprawdz czy opcja nie jest domyslna
-            let optionPrice = thisProduct.data.params.options.default;
-            if(optionPrice = false) {     //sprawdzić czy opcja jest domyślna - default: true
+            if(!option.default) {     //sprawdzić czy opcja jest domyślna - default: true   ! - spr czy option default jest czyms pustym
               // add option price to price variable
-              price = price + optionPrice;
+              price = price + option.price;
             }
           } else {
             // check if the option is default - sprawdz czy opcja jest domyslna
-            if(optionPrice = true) {
+            if(option.default) {     // czy option default istnieje i ma jakas wartosc
               // reduce price variable
-              price = price - optionPrice;
+              price = price - option.price;
             }     
+          }
+
+
+          // Add component picture
+          const optionImage = thisProduct.imageWrapper.querySelector('.'+paramId+'-'+optionId);
+          if(optionImage){                                                         /* czemu tylko optionImage w if'ie */
+            if(formData[paramId] && formData[paramId].includes(optionId)){
+              optionImage.classList.add(classNames.menuProduct.imageVisible);                /* stała przechowująca klasę active */
+            } else {
+              optionImage.classList.remove(classNames.menuProduct.imageVisible);
+            }
           }
         }
       }
