@@ -172,9 +172,9 @@
 
           // Add component picture
           const optionImage = thisProduct.imageWrapper.querySelector('.'+paramId+'-'+optionId);
-          if(optionImage){                                                         /* czemu tylko optionImage w if'ie */
+          if(optionImage){                                                         /* czemu tylko optionImage w if'ie - spr czy istnieje */
             if(formData[paramId] && formData[paramId].includes(optionId)){
-              optionImage.classList.add(classNames.menuProduct.imageVisible);                /* stała przechowująca klasę active */
+              optionImage.classList.add(classNames.menuProduct.imageVisible);        /* stała przechowująca klasę active */
             } else {
               optionImage.classList.remove(classNames.menuProduct.imageVisible);
             }
