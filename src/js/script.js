@@ -59,8 +59,9 @@
       thisProduct.data = data;    /* data zawiera wszystkie właściwości produktu (name, price, desctription) */
       thisProduct.renderInMenu();  /* uruchomienie metody */
       thisProduct.getElements();
-      thisProduct.initAccordion();  /* uruchomienie metody */
+      thisProduct.initAccordion();
       thisProduct.initOrderForm();
+      thisProduct.initAmountWidget(); // czemu przed processOrder ?????????
       thisProduct.processOrder();
 
       console.log('new Product:', thisProduct);
@@ -86,7 +87,8 @@
       thisProduct.formInputs = thisProduct.form.querySelectorAll(select.all.formInputs);
       thisProduct.cartButton = thisProduct.element.querySelector(select.menuProduct.cartButton);
       thisProduct.priceElem = thisProduct.element.querySelector(select.menuProduct.priceElem);
-      thisProduct.imageWrapper = thisProduct.element.querySelector(select.menuProduct.imageWrapper);                                   /* czy jest ok ?????????? */
+      thisProduct.imageWrapper = thisProduct.element.querySelector(select.menuProduct.imageWrapper);                                 
+      thisProduct.amountWidgetElem = thisProduct.element.querySelector(select.menuProduct.amountWidget);
     }
 
 
@@ -169,9 +171,8 @@
             }     
           }
 
-
           // Add component picture
-          const optionImage = thisProduct.imageWrapper.querySelector('.'+paramId+'-'+optionId);
+          const optionImage = thisProduct.imageWrapper.querySelector('.'+paramId+'-'+optionId);  // selektor  .paramId-optionId
           if(optionImage){                                                         /* czemu tylko optionImage w if'ie - spr czy istnieje */
             if(formData[paramId] && formData[paramId].includes(optionId)){
               optionImage.classList.add(classNames.menuProduct.imageVisible);        /* stała przechowująca klasę active */
@@ -184,7 +185,59 @@
       // update calculated price in the HTML
       thisProduct.priceElem.innerHTML = price;  // wpisanie przeliczonej ceny do elementu w HTML-u:
     } 
+
+    initAmountWidget(){
+      const thisProduct = this;
+      thisProduct.amountWidgetElem = new amountWidget(thisProduct.amountWidgetElem);    // Wyjasnienie linii ?????????????????
+    }
   }
+
+  class amountWidget{
+    constructor(element){
+      const thisWidget = this;
+      
+      console.log('AmountWidget:', thisWidget);
+      console.log('constructor arguments:', element);
+      thisWidget.getElements(element);
+      thisWidget.setValue(thisWidget.input.value);
+      thisWidget.initActions();
+    }
+
+    getElements(element){
+      const thisWidget = this;
+    
+      thisWidget.element = element;
+      thisWidget.input = thisWidget.element.querySelector(select.widgets.amount.input);
+      thisWidget.linkDecrease = thisWidget.element.querySelector(select.widgets.amount.linkDecrease);
+      thisWidget.linkIncrease = thisWidget.element.querySelector(select.widgets.amount.linkIncrease);
+    }
+
+    setValue(value){
+      const thisWidget = this;
+
+      const newValue = parseInt(value);
+
+      /* TODO: Add validation */
+
+      thisWidget.value = newValue;
+      thisWidget.input.value = thisWidget.value;
+      if(thisWidget.value !== newValue && !isNaN(newValue) && settings.amountWidget.defaultMax > newValue > settings.amountWidget.defaultMin) { // czemu wykrzyknik????????  (!isNaN) // !== różne wartości i typy danych ; czy wartość, która przychodzi do funkcji, jest inna niż ta, która jest już aktualnie w thisWidget.value i czy nie jest nullem - tekstem
+        thisWidget.value = newValue;                 // thisWidget.value zmieni się tylko wtedy, jeśli nowa wpisana w input wartość będzie inna niż obecna.
+      }
+    }
+
+    initActions(){
+      thisWidget.input.addEventListener('change', setValue(thisWidget.input.value));
+      thisWidget.linkDecrease.addEventListener('click', setValue(thisWidget.value -- 1)) {
+        click.preventDefault();
+      } 
+      thisWidget.linkIncrease.addEventListener('click', setValue(thisWidget.value ++ 1)) {
+        click.preventDefault();
+      }
+    }
+
+  } 
+
 
 
   const app = {
