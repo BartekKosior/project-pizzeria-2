@@ -221,22 +221,36 @@
 
       thisWidget.value = newValue;
       thisWidget.input.value = thisWidget.value;
-      if(thisWidget.value !== newValue && !isNaN(newValue) && settings.amountWidget.defaultMax > newValue > settings.amountWidget.defaultMin) { // czemu wykrzyknik????????  (!isNaN) // !== różne wartości i typy danych ; czy wartość, która przychodzi do funkcji, jest inna niż ta, która jest już aktualnie w thisWidget.value i czy nie jest nullem - tekstem
+      if(thisWidget.value !== newValue && !isNaN(newValue) && settings.amountWidget.defaultMax > newValue && newValue > settings.amountWidget.defaultMin) { // czemu wykrzyknik????????  (!isNaN) // !== różne wartości i typy danych ; czy wartość, która przychodzi do funkcji, jest inna niż ta, która jest już aktualnie w thisWidget.value i czy nie jest nullem - tekstem
         thisWidget.value = newValue;                 // thisWidget.value zmieni się tylko wtedy, jeśli nowa wpisana w input wartość będzie inna niż obecna.
       }
+      // announce();               //czy dobre miejsce wywolania ??????????
     }
 
     initActions(){
-      thisWidget.input.addEventListener('change', setValue(thisWidget.input.value));
-      thisWidget.linkDecrease.addEventListener('click', setValue(thisWidget.value -- 1)) {
-        click.preventDefault();
-      } 
-      thisWidget.linkIncrease.addEventListener('click', setValue(thisWidget.value ++ 1)) {
-        click.preventDefault();
-      }
+      const thisWidget = this;
+
+      thisWidget.input.addEventListener('change', function() { this.setValue(thisWidget.input.value) });
+      thisWidget.linkDecrease.addEventListener('click', function() { this.setValue(thisWidget.value - 1) });
+      //click.preventDefault();
+            
+      thisWidget.linkIncrease.addEventListener('click', function() { this.setValue(thisWidget.value + 1) });
+      //click.preventDefault();
+      
     }
 
-  } 
+    /*announce(){
+      const thisWidget = this;
+
+      const event = new Event('updated');
+      thisWidget.element.dispatchEvent(event);      
+    }*/
+
+
+
+
+
+  }
 
 
 
