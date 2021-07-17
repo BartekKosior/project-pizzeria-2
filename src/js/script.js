@@ -57,6 +57,7 @@
       const thisProduct = this;
       thisProduct.id = id;
       thisProduct.data = data;    /* data zawiera wszystkie właściwości produktu (name, price, desctription) */
+      thisProduct.amount = 1;
       thisProduct.renderInMenu();  /* uruchomienie metody */
       thisProduct.getElements();
       thisProduct.initAccordion();
@@ -77,7 +78,6 @@
       /* add element to menu */   /* wstawić stworzony element DOM do znalezionego kontenera menu */
       menuContainer.appendChild(thisProduct.element);
     }
-
     
     getElements(){    /* metoda do znalezienia elementów w kontenerze produktu ; swego rodzaju spis treści */
       const thisProduct = this;
@@ -90,7 +90,6 @@
       thisProduct.imageWrapper = thisProduct.element.querySelector(select.menuProduct.imageWrapper);                                 
       thisProduct.amountWidgetElem = thisProduct.element.querySelector(select.menuProduct.amountWidget);
     }
-
 
     initAccordion(){
       const thisProduct = this;
@@ -112,7 +111,6 @@
       });
     }
     
-
     initOrderForm(){
       const thisProduct = this;
       console.log('initOrderForm:');
@@ -183,23 +181,29 @@
         }
       }
       // update calculated price in the HTML
-      thisProduct.priceElem.innerHTML = price;  // wpisanie przeliczonej ceny do elementu w HTML-u:
+      thisProduct.price = price * thisProduct.amount;
+      thisProduct.priceSingle = price;
+      
+      thisProduct.priceElem.innerHTML = price * thisProduct.amount;  // wpisanie przeliczonej ceny do elementu w HTML-u:   //pomnozenie ceny przez ilosc szt wybraną w widgecie
     } 
 
     initAmountWidget(){
       const thisProduct = this;
-      thisProduct.amountWidgetElem = new amountWidget(thisProduct.amountWidgetElem);    // Wyjasnienie linii ?????????????????
+      thisProduct.amountWidget = new amountWidget(thisProduct.amountWidgetElem);
+      thisProduct.amountWidgetElem.addEventListener('updated', function(){
+        thisProduct.amount = thisProduct.amountWidget.value;
+        thisProduct.processOrder();
+      });
     }
   }
 
   class amountWidget{
     constructor(element){
       const thisWidget = this;
-      
       console.log('AmountWidget:', thisWidget);
       console.log('constructor arguments:', element);
       thisWidget.getElements(element);
-      thisWidget.setValue(thisWidget.input.value);
+      thisWidget.setValue(thisWidget.input.value || settings.amountWidget.defaultValue); // wartość startowa ..... albo ......
       thisWidget.initActions();
     }
 
@@ -214,45 +218,35 @@
 
     setValue(value){
       const thisWidget = this;
-
-      const newValue = parseInt(value);
-
+      const newValue = parseInt(value);    //konwertowanie tekstu do liczby. Każdy input daje tekst
       /* TODO: Add validation */
-
-      thisWidget.value = newValue;
-      thisWidget.input.value = thisWidget.value;
-      if(thisWidget.value !== newValue && !isNaN(newValue) && settings.amountWidget.defaultMax > newValue && newValue > settings.amountWidget.defaultMin) { // czemu wykrzyknik????????  (!isNaN) // !== różne wartości i typy danych ; czy wartość, która przychodzi do funkcji, jest inna niż ta, która jest już aktualnie w thisWidget.value i czy nie jest nullem - tekstem
+      if(thisWidget.value !== newValue && !isNaN(newValue) && newValue <= settings.amountWidget.defaultMax && newValue >= settings.amountWidget.defaultMin) { // czemu wykrzyknik????????  (!isNaN) // !== różne wartości i typy danych ; czy wartość, która przychodzi do funkcji, jest inna niż ta, która jest już aktualnie w thisWidget.value i czy nie jest nullem - tekstem
         thisWidget.value = newValue;                 // thisWidget.value zmieni się tylko wtedy, jeśli nowa wpisana w input wartość będzie inna niż obecna.
       }
-      // announce();               //czy dobre miejsce wywolania ??????????
+      thisWidget.input.value = thisWidget.value;
+      thisWidget.announce();
     }
 
-    initActions(){
+    initActions(){           
       const thisWidget = this;
-
-      thisWidget.input.addEventListener('change', function() { this.setValue(thisWidget.input.value) });
-      thisWidget.linkDecrease.addEventListener('click', function() { this.setValue(thisWidget.value - 1) });
-      //click.preventDefault();
-            
-      thisWidget.linkIncrease.addEventListener('click', function() { this.setValue(thisWidget.value + 1) });
-      //click.preventDefault();
+      thisWidget.input.addEventListener('change', function() { thisWidget.setValue(this.value);});
+      thisWidget.linkDecrease.addEventListener('click', function(e) { 
+        e.preventDefault();
+        thisWidget.setValue(thisWidget.value - 1);
+      });
       
+      thisWidget.linkIncrease.addEventListener('click', function(e) { 
+        e.preventDefault();
+        thisWidget.setValue(thisWidget.value + 1);
+      });
     }
 
-    /*announce(){
+    announce(){
       const thisWidget = this;
-
       const event = new Event('updated');
-      thisWidget.element.dispatchEvent(event);      
-    }*/
-
-
-
-
-
+      thisWidget.element.dispatchEvent(event);
+    }
   }
-
-
 
   const app = {
     initMenu: function(){                                                 /* metoda app.initMenu */
