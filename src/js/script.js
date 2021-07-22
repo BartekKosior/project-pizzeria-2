@@ -6,6 +6,7 @@
   const select = {
     templateOf: {
       menuProduct: '#template-menu-product',
+      cartProduct: '#template-cart-product', // CODE ADDED
     },
     containerOf: {
       menu: '#product-list',
@@ -26,11 +27,32 @@
     },
     widgets: {
       amount: {
-        input: 'input[name="amount"]',
+        input:'input.amount', // CODE CHANGED   /* input: 'input[name="amount"]', */
         linkDecrease: 'a[href="#less"]',
         linkIncrease: 'a[href="#more"]',
       },
     },
+  
+    // CODE ADDED START
+    cart: {
+      productList: '.cart__order-summary',
+      toggleTrigger: '.cart__summary',
+      totalNumber: '.cart__total-number',
+      totalPrice: '.cart__total-price strong, .cart__order-total .cart__order-price-sum strong',
+      subtotalPrice: '.cart__order-subtotal .cart__order-price-sum strong',   
+      deliveryFee: '.cart__order-delivery .cart__order-price-sum strong', 
+      form: '.cart__order',
+      formSubmit: '.cart__order [type="submit"]',
+      phone: '[name="phone"]',
+      address: '[name="address"]',
+    },
+    cartProduct: {
+      amountWidget: '.widget-amount',
+      price: '.cart__product-price',
+      edit: '[href="#edit"]',
+      remove: '[href="#remove"]',
+    },
+    // CODE ADDED END
   };
 
   const classNames = {
@@ -38,6 +60,11 @@
       wrapperActive: 'active',
       imageVisible: 'active',
     },
+    // CODE ADDED START
+    cart: {
+      wrapperActive: 'active',
+    }
+    // CODE ADDED END
   };
 
   const settings = {
@@ -45,11 +72,19 @@
       defaultValue: 1,
       defaultMin: 1,
       defaultMax: 9,
+    }, // CODE CHANGED
+    // CODE ADDED START
+    cart:{
+      defaultDeliveryFee: 20,
     }
+    // CODE ADDED END
   };
 
   const templates = {
     menuProduct: Handlebars.compile(document.querySelector(select.templateOf.menuProduct).innerHTML),
+    // CODE ADDED START
+    cartProduct: Handlebars.compile(document.querySelector(select.templateOf.cartProduct).innerHTML),
+    // CODE ADDED END
   };
 
   class Product{
@@ -81,7 +116,6 @@
     
     getElements(){    /* metoda do znalezienia elementów w kontenerze produktu ; swego rodzaju spis treści */
       const thisProduct = this;
-      
       thisProduct.accordionTrigger = thisProduct.element.querySelector(select.menuProduct.clickable);
       thisProduct.form = thisProduct.element.querySelector(select.menuProduct.form);
       thisProduct.formInputs = thisProduct.form.querySelectorAll(select.all.formInputs);
@@ -129,6 +163,7 @@
       thisProduct.cartButton.addEventListener('click', function(event){
         event.preventDefault(); /* blokowanie zmiany adresu strony po kliknięciu w link */
         thisProduct.processOrder();  /* obliczenie ceny produktu */
+        thisProduct.addToCart();
       });
     }
         
@@ -183,7 +218,6 @@
       // update calculated price in the HTML
       thisProduct.price = price * thisProduct.amount;
       thisProduct.priceSingle = price;
-      
       thisProduct.priceElem.innerHTML = price * thisProduct.amount;  // wpisanie przeliczonej ceny do elementu w HTML-u:   //pomnozenie ceny przez ilosc szt wybraną w widgecie
     } 
 
@@ -195,6 +229,24 @@
         thisProduct.processOrder();
       });
     }
+
+    addToCart(){
+      const thisProduct = this;
+      app.cart.add(thisProduct.prepareCartProduct());
+    }
+
+    prepareCartProduct(){
+      const thisProduct = this;
+      const productSummary = {};
+      productSummary.id = thisProduct.id;                   
+      productSummary.name = thisProduct.data.name;          
+      productSummary.amount = thisProduct.amount;           
+      productSummary.priceSingle = thisProduct.priceSingle; 
+      productSummary.price = thisProduct.price * thisProduct.amount;    //cena całkowita, czyli c.j. pomnożona przez ilość sztuk 
+      productSummary.params = {};
+      return productSummary;
+    }
+
   }
 
   class amountWidget{
@@ -209,7 +261,6 @@
 
     getElements(element){
       const thisWidget = this;
-    
       thisWidget.element = element;
       thisWidget.input = thisWidget.element.querySelector(select.widgets.amount.input);
       thisWidget.linkDecrease = thisWidget.element.querySelector(select.widgets.amount.linkDecrease);
@@ -248,6 +299,35 @@
     }
   }
 
+  class Cart{
+    constructor(element){
+      const thisCart = this;
+      thisCart.products = [];
+      thisCart.getElements(element);
+      thisCart.initActions();
+      console.log('new cart', thisCart);
+    }
+
+    getElements(element){
+      const thisCart = this;
+      thisCart.dom = {};
+      thisCart.dom.wrapper = element;
+      thisCart.dom.toggleTrigger = thisCart.dom.wrapper.querySelector(select.cart.toggleTrigger);
+    }
+
+    initActions(){
+      const thisCart = this;
+      thisCart.dom.toggleTrigger.addEventListener('click', function() {
+        thisCart.dom.wrapper.classList.toggle(classNames.cart.wrapperActive);      // zwijanie i rozwijanie koszyka ?????????????????????? 
+      });
+    }
+
+    add(menuProduct){
+      // const thisCart = this;
+      console.log('adding product', menuProduct);
+    }
+  }
+
   const app = {
     initMenu: function(){                                                 /* metoda app.initMenu */
       const thisApp = this;
@@ -264,6 +344,12 @@
       thisApp.data = dataSource;
     },
 
+    initCart: function(){
+      const thisApp = this;
+      const cartElem = document.querySelector(select.containerOf.cart);
+      thisApp.cart = new Cart(cartElem);
+    },
+    
     init: function(){
       const thisApp = this;
       console.log('*** App starting ***');
@@ -274,6 +360,7 @@
 
       thisApp.initData();
       thisApp.initMenu();
+      thisApp.initCart();
     },
   };
 
