@@ -244,9 +244,35 @@
       productSummary.priceSingle = thisProduct.priceSingle; 
       productSummary.price = thisProduct.price * thisProduct.amount;    //cena całkowita, czyli c.j. pomnożona przez ilość sztuk 
       productSummary.params = {};
-      return productSummary;
+      return productSummary;                  //zwrócenie całego obiektu
     }
 
+    prepareCartProductParams(){    //przejście po wszystkich kategoriach produktu, następnie po ich opcjach,sprawdzenie czy są one wybrane i wygenerowania podsumowania w formie małego obiektu
+      const thisProduct = this;
+      // covert form to object structure e.g. { sauce: ['tomato'], toppings: ['olives', 'redPeppers']}  Dostęp do formularza
+      const formData = utils.serializeFormToObject(thisProduct.form);
+      const params = {};
+      
+      
+      // for every category (param)
+      for(let paramId in thisProduct.data.params) {
+        const param = thisProduct.data.params[paramId]; // pętla for..in zwraca tylko nazwę właśc. Ta linijka dba o to, aby dostać się do całego obiektu dost. pod tą właśc.
+        // create category param in params const eg. params = { ingredients: { name: 'Ingredients', options: {}}}
+        params[paramId] = {
+          label:param.label,
+          options:{}
+        };
+        // for every option in this category
+        for(let optionId in param.options) {
+          const option = param.options[optionId];    // dostanie się do całego obiektu dost. pod tą właśc.
+          const optionSelected = formData[paramId] && formData[paramId].includes(optionId);
+          if(optionSelected){
+            // Option is selected
+          }
+        }
+      }
+      return params;
+    }
   }
 
   class amountWidget{
@@ -318,7 +344,7 @@
     initActions(){
       const thisCart = this;
       thisCart.dom.toggleTrigger.addEventListener('click', function() {
-        thisCart.dom.wrapper.classList.toggle(classNames.cart.wrapperActive);      // zwijanie i rozwijanie koszyka ?????????????????????? 
+        thisCart.dom.wrapper.classList.toggle(classNames.cart.wrapperActive);      // zwijanie i rozwijanie koszyka
       });
     }
 
