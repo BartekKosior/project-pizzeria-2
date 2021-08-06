@@ -243,8 +243,8 @@
       productSummary.amount = thisProduct.amount;           
       productSummary.priceSingle = thisProduct.priceSingle; 
       productSummary.price = thisProduct.price * thisProduct.amount;    //cena całkowita, czyli c.j. pomnożona przez ilość sztuk 
-      productSummary.params = {};
-      return productSummary;                  //zwrócenie całego obiektu
+      productSummary.params = thisProduct.prepareCartProductParams();             // () w\laczaja funkcje  // jako wartość params prepareCartProduct ustawia to, co zwraca metoda prepareCartProductParams
+      return productSummary;                                            //zwrócenie całego obiektu
     }
 
     prepareCartProductParams(){    //przejście po wszystkich kategoriach produktu, następnie po ich opcjach,sprawdzenie czy są one wybrane i wygenerowania podsumowania w formie małego obiektu
@@ -268,6 +268,7 @@
           const optionSelected = formData[paramId] && formData[paramId].includes(optionId);
           if(optionSelected){
             // Option is selected
+            params[paramId].options[optionId] = option.label;
           }
         }
       }
@@ -339,6 +340,7 @@
       thisCart.dom = {};
       thisCart.dom.wrapper = element;
       thisCart.dom.toggleTrigger = thisCart.dom.wrapper.querySelector(select.cart.toggleTrigger);
+      thisCart.dom.productList = thisCart.dom.wrapper.querySelector(select.containerOf.menu);
     }
 
     initActions(){
@@ -349,8 +351,17 @@
     }
 
     add(menuProduct){
-      // const thisCart = this;
+      const thisCart = this;
       console.log('adding product', menuProduct);
+      /* generate HTML based on template */   /* wygenerować kod HTML pojedynczego produktu */
+      const generatedHTML = templates.menuProduct(thisCart.data);  /* wywołanie metody templates.menuProduct i przekazanie jej danych produktu */
+      /* create element using utils.createElementFromHTML */    /* stworzyć element DOM na podstawie tego kodu produktu */
+      thisCart.element = utils.createDOMFromHTML(generatedHTML);
+      const generatedDOM = thisCart.element;
+      generatedDOM.appendChild(thisCart.dom.productList);
+      
+
+
     }
   }
 
