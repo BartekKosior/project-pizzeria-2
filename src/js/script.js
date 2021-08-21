@@ -327,7 +327,7 @@
   }
 
   // Cały koszyk:
-  class Cart{  
+  class Cart{
     constructor(element){
       const thisCart = this;
       thisCart.products = [];
@@ -342,6 +342,10 @@
       thisCart.dom.wrapper = element;
       thisCart.dom.toggleTrigger = thisCart.dom.wrapper.querySelector(select.cart.toggleTrigger);
       thisCart.dom.productList = thisCart.dom.wrapper.querySelector(select.cart.productList);
+      thisCart.dom.deliveryFee = thisCart.dom.wrapper.querySelector(select.cart.deliveryFee);
+      thisCart.dom.subTotalPrice = thisCart.dom.wrapper.querySelector(select.cart.subtotalPrice);
+      thisCart.dom.totalPrice = thisCart.dom.wrapper.querySelector(select.cart.totalPrice);
+      thisCart.dom.totalNumber = thisCart.dom.wrapper.querySelector(select.cartProduct.amountWidget);
     }
 
     initActions(){
@@ -362,14 +366,28 @@
       thisCart.dom.productList.appendChild(generatedDOM);
       thisCart.products.push(new CartProduct(menuProduct, generatedDOM));
       console.log('thisCart.products', thisCart.products);
+      thisCart.update();
     }
 
     //Sumowanie koszyka
     update(){
       const thisCart = this;
-      
+      const deliveryFee = settings.cart.defaultDeliveryFee;            // cena dostawy
+      const totalNumber = 0;                                           // całościowa liczba sztuk
+      const subTotalPrice = 0;                                         // zsumowana cena za wszystko - bez kosztu dostawy
+      const thisCartProducts = [];                                     
+      for(let thisCartProduct of thisCartProducts){                    
+        totalNumber + thisCartProduct.amount;                          // zwiększenie totalNumber o liczbę sztuk danego produktu
+        subTotalPrice + thisCartProduct.price;                  
+      }
+      thisCart.totalPrice = subTotalPrice + deliveryFee;        // własciwosć thisCart.totalPrice - jej wartoscią jest cena całkowita i koszt dostawy. Własciwosc jest dostepna w całej instancji - stała nie.
+      if (subTotalPrice == 0){
+        deliveryFee == 0;
+      }
+      console.log('totalNumber', totalNumber);
+      console.log('subTotalPrice', subTotalPrice);
+      console.log('this.totalPrice', this.totalPrice);
     }
-
   }
 
   // Pojedyńczy produkt w koszyku:
@@ -441,6 +459,7 @@
       thisApp.initData();
       thisApp.initMenu();
       thisApp.initCart();
+
     },
   };
 
