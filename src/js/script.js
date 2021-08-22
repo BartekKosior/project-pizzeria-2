@@ -375,18 +375,24 @@
       const deliveryFee = settings.cart.defaultDeliveryFee;            // cena dostawy
       const totalNumber = 0;                                           // całościowa liczba sztuk
       const subTotalPrice = 0;                                         // zsumowana cena za wszystko - bez kosztu dostawy
-      const thisCartProducts = [];                                     
+      const thisCartProducts = [];                  
       for(let thisCartProduct of thisCartProducts){                    
         totalNumber + thisCartProduct.amount;                          // zwiększenie totalNumber o liczbę sztuk danego produktu
         subTotalPrice + thisCartProduct.price;                  
       }
       thisCart.totalPrice = subTotalPrice + deliveryFee;        // własciwosć thisCart.totalPrice - jej wartoscią jest cena całkowita i koszt dostawy. Własciwosc jest dostepna w całej instancji - stała nie.
-      if (subTotalPrice == 0){
-        deliveryFee == 0;
+      if (subTotalPrice != 0){
+        deliveryFee != 0;
       }
       console.log('totalNumber', totalNumber);
       console.log('subTotalPrice', subTotalPrice);
       console.log('this.totalPrice', this.totalPrice);
+      
+     // thisCart.dom.update.addEventListener('updated', function(){
+        thisCart.dom.subTotalPrice.innerHTML = thisCart.subTotalPrice;
+        thisCart.dom.totalPrice.innerHTML = thisCart.totalPrice;
+        thisCart.dom.deliveryFee.innerHTML = thisCart.deliveryFee;
+     // });
     }
   }
 
