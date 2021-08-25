@@ -321,7 +321,10 @@
 
     announce(){
       const thisWidget = this;
-      const event = new Event('updated');
+      // const event = new Event('updated');    zmiana kodu na:
+      const event = new CustomEvent('updated', {
+        bubbles: true                            // Z bubbles event będzie emitowany na elemencie, ale również na jego rodzicu, oraz dziadku, itd az do <body>, document i window
+      });
       thisWidget.element.dispatchEvent(event);
     }
   }
@@ -353,6 +356,9 @@
       thisCart.dom.toggleTrigger.addEventListener('click', function() {
         thisCart.dom.wrapper.classList.toggle(classNames.cart.wrapperActive);      // zwijanie i rozwijanie koszyka
       });
+      thisCart.dom.productList.addEventListener('updated', function(){
+        thisCart.update();
+      });
     }
 
     add(menuProduct){
@@ -375,24 +381,25 @@
       const deliveryFee = settings.cart.defaultDeliveryFee;            // cena dostawy
       const totalNumber = 0;                                           // całościowa liczba sztuk
       const subTotalPrice = 0;                                         // zsumowana cena za wszystko - bez kosztu dostawy
-      const thisCartProducts = [];                  
-      for(let thisCartProduct of thisCartProducts){                    
+      for(let thisCartProduct of thisCart.products){                    
         totalNumber + thisCartProduct.amount;                          // zwiększenie totalNumber o liczbę sztuk danego produktu
         subTotalPrice + thisCartProduct.price;                  
       }
-      thisCart.totalPrice = subTotalPrice + deliveryFee;        // własciwosć thisCart.totalPrice - jej wartoscią jest cena całkowita i koszt dostawy. Własciwosc jest dostepna w całej instancji - stała nie.
-      if (subTotalPrice != 0){
-        deliveryFee != 0;
+      thisCart.totalPrice = subTotalPrice + deliveryFee;    // własciwosć thisCart.totalPrice - jej wartoscią jest cena całkowita i koszt dostawy. Własciwosc jest dostepna w całej instancji - stała nie.
+      if (subTotalPrice == 0){
+        deliveryFee == 0;
       }
+      
       console.log('totalNumber', totalNumber);
       console.log('subTotalPrice', subTotalPrice);
       console.log('this.totalPrice', this.totalPrice);
+      console.log('deliveryFee', deliveryFee);
       
-     // thisCart.dom.update.addEventListener('updated', function(){
-        thisCart.dom.subTotalPrice.innerHTML = thisCart.subTotalPrice;
-        thisCart.dom.totalPrice.innerHTML = thisCart.totalPrice;
-        thisCart.dom.deliveryFee.innerHTML = thisCart.deliveryFee;
-     // });
+      //thisCart.dom.update.addEventListener('updated', function(){
+      thisCart.dom.subTotalPrice.innerHTML = thisCart.subTotalPrice;
+      thisCart.dom.totalPrice.innerHTML = thisCart.totalPrice;
+      thisCart.dom.deliveryFee.innerHTML = thisCart.deliveryFee;
+      //});
     }
   }
 
@@ -407,6 +414,8 @@
       thisCartProduct.amount = menuProduct.amount;
       thisCartProduct.getElements(element);
       thisCartProduct.amountWidget();
+      thisCartProduct.remove();
+      thisCartProduct.initActions();
       console.log(thisCartProduct);
     }
 
@@ -428,6 +437,21 @@
         thisCartProduct.price = thisCartProduct.priceSingle*thisCartProduct.amount;
         thisCartProduct.dom.price.innerHTML = thisCartProduct.price;
       });
+    }
+
+    remove(){
+      const thisCartProduct = this;
+      const event = new CustomEvent('remove', {
+        bubbles: true,
+        detail: {                               // wskazanie co ma być usunięte
+          cartProduct: thisCartProduct,
+        },
+      });
+      thisCartProduct.dom.wrapper.dispatchEvent(event);
+    }
+
+    initActions(){
+
     }
 
   }
