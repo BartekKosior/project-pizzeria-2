@@ -347,8 +347,8 @@
       thisCart.dom.productList = thisCart.dom.wrapper.querySelector(select.cart.productList);
       thisCart.dom.deliveryFee = thisCart.dom.wrapper.querySelector(select.cart.deliveryFee);
       thisCart.dom.subTotalPrice = thisCart.dom.wrapper.querySelector(select.cart.subtotalPrice);
-      thisCart.dom.totalPrice = thisCart.dom.wrapper.querySelector(select.cart.totalPrice);
-      thisCart.dom.totalNumber = thisCart.dom.wrapper.querySelector(select.cartProduct.amountWidget);
+      thisCart.dom.totalPrice = thisCart.dom.wrapper.querySelectorAll(select.cart.totalPrice);
+      thisCart.dom.totalNumber = thisCart.dom.wrapper.querySelector(select.cart.totalNumber);
     }
 
     initActions(){
@@ -358,6 +358,9 @@
       });
       thisCart.dom.productList.addEventListener('updated', function(){
         thisCart.update();
+      });
+      thisCart.dom.productList.addEventListener('remove', function(event){
+        thisCart.remove(event.detail.cartProduct);
       });
     }
 
@@ -378,28 +381,47 @@
     //Sumowanie koszyka
     update(){
       const thisCart = this;
-      const deliveryFee = settings.cart.defaultDeliveryFee;            // cena dostawy
-      const totalNumber = 0;                                           // całościowa liczba sztuk
-      const subTotalPrice = 0;                                         // zsumowana cena za wszystko - bez kosztu dostawy
+      thisCart.deliveryFee = settings.cart.defaultDeliveryFee;            // cena dostawy
+      thisCart.totalNumber = 0;                                           // całościowa liczba sztuk
+      thisCart.subTotalPrice = 0;                                         // zsumowana cena za wszystko - bez kosztu dostawy
       for(let thisCartProduct of thisCart.products){                    
-        totalNumber + thisCartProduct.amount;                          // zwiększenie totalNumber o liczbę sztuk danego produktu
-        subTotalPrice + thisCartProduct.price;                  
+        thisCart.totalNumber = thisCart.totalNumber + thisCartProduct.amount;            // zwiększenie totalNumber o liczbę sztuk danego produktu
+        thisCart.subTotalPrice = thisCart.subTotalPrice + thisCartProduct.price;                  
       }
-      thisCart.totalPrice = subTotalPrice + deliveryFee;    // własciwosć thisCart.totalPrice - jej wartoscią jest cena całkowita i koszt dostawy. Własciwosc jest dostepna w całej instancji - stała nie.
-      if (subTotalPrice == 0){
-        deliveryFee == 0;
+      if (thisCart.subTotalPrice == 0){
+        thisCart.deliveryFee = 0;
       }
+      thisCart.totalPrice = thisCart.subTotalPrice + thisCart.deliveryFee;    // własciwosć thisCart.totalPrice - jej wartoscią jest cena całkowita i koszt dostawy. Własciwosc jest dostepna w całej instancji - stała nie.
+              
+      console.log('thisCart.totalNumber', thisCart.totalNumber);
+      console.log('thisCart.subTotalPrice',thisCart.subTotalPrice);
+      console.log('thisCart.totalPrice', thisCart.totalPrice);
+      console.log('thisCart.deliveryFee', thisCart.deliveryFee);
       
-      console.log('totalNumber', totalNumber);
-      console.log('subTotalPrice', subTotalPrice);
-      console.log('this.totalPrice', this.totalPrice);
-      console.log('deliveryFee', deliveryFee);
-      
-      //thisCart.dom.update.addEventListener('updated', function(){
       thisCart.dom.subTotalPrice.innerHTML = thisCart.subTotalPrice;
-      thisCart.dom.totalPrice.innerHTML = thisCart.totalPrice;
+      for(const LM of thisCart.dom.totalPrice){
+        LM.innerHTML = thisCart.totalPrice;
+      }
       thisCart.dom.deliveryFee.innerHTML = thisCart.deliveryFee;
-      //});
+      thisCart.dom.totalNumber.innerHTML = thisCart.totalNumber;
+    }
+
+    
+
+    remove(thisCartProduct){
+      const thisCart = this;
+      // Usunięcie reprezentacji produktu z HTML-a,
+      thisCartProduct.dom.wrapper.remove();
+      // console.log('thisCartProduct', thisCartProduct);
+      // Usunięcie informacji o danym produkcie z tablicy thisCart.products.
+      const thisCartproductsLenght = thisCart.products.lenght;       // odczytanie ilosci elementów
+      console.log('thisCartproductsLenght', thisCartproductsLenght);
+      const index = thisCart.products.indexOf(thisCartProduct);
+      thisCart.products.splice(index, 1);
+
+      // Wywołać metodę update w celu przeliczenia sum po usunięciu produktu.
+      thisCart.update();
+
     }
   }
 
@@ -414,7 +436,6 @@
       thisCartProduct.amount = menuProduct.amount;
       thisCartProduct.getElements(element);
       thisCartProduct.amountWidget();
-      thisCartProduct.remove();
       thisCartProduct.initActions();
       console.log(thisCartProduct);
     }
@@ -451,8 +472,17 @@
     }
 
     initActions(){
-
+      const thisCartProduct = this;
+      thisCartProduct.dom.edit.addEventListener('click', function(event){
+        event.preventDefault();
+        thisCartProduct.remove();   //wywołanie metody
+      });
+      thisCartProduct.dom.remove.addEventListener('click', function(event){
+        event.preventDefault();
+        thisCartProduct.remove();   //wywołanie metody
+      });
     }
+  
 
   }
 
