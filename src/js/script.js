@@ -76,8 +76,14 @@
     // CODE ADDED START
     cart:{
       defaultDeliveryFee: 20,
-    }
+    },
     // CODE ADDED END
+    db: {
+      url: '//localhost:3131',
+      products: 'products',
+      orders: 'orders',
+    },
+
   };
 
   const templates = {
@@ -349,6 +355,7 @@
       thisCart.dom.subTotalPrice = thisCart.dom.wrapper.querySelector(select.cart.subtotalPrice);
       thisCart.dom.totalPrice = thisCart.dom.wrapper.querySelectorAll(select.cart.totalPrice);
       thisCart.dom.totalNumber = thisCart.dom.wrapper.querySelector(select.cart.totalNumber);
+      thisCart.dom.form = thisCart.dom.wrapper.querySelector(select.cart.form);
     }
 
     initActions(){
@@ -361,6 +368,9 @@
       });
       thisCart.dom.productList.addEventListener('remove', function(event){
         thisCart.remove(event.detail.cartProduct);
+      });
+      thisCart.dom.form.addEventListener('submit', function(event){
+        event.preventDefault();
       });
     }
 
@@ -405,8 +415,6 @@
       thisCart.dom.deliveryFee.innerHTML = thisCart.deliveryFee;
       thisCart.dom.totalNumber.innerHTML = thisCart.totalNumber;
     }
-
-    
 
     remove(thisCartProduct){
       const thisCart = this;
@@ -493,13 +501,31 @@
       /* const testProduct = new Product();
       console.log('testProduct:', testProduct); */
       for(let productData in thisApp.data.products){                    /* Tworzenie w pętli nowej instancji dla każdego produktu */ /* pobranie cake, breakfast, pizza, salad - jak pobiera z data.js */
-        new Product(productData, thisApp.data.products[productData]);
+        // new Product(productData, thisApp.data.products[productData]);
+        new Product(thisApp.data.products[productData].id, thisApp.data.products[productData]);
       }
     },
 
     initData: function(){                                                /* dostęp do danych z obiektu dataSource z pliku data.js */
       const thisApp = this;
-      thisApp.data = dataSource;
+      // thisApp.data = dataSource;  - zmiana w związku z API
+      // ADDED NEW CODE:
+      thisApp.data = {};
+      const url = settings.db.url + '/' + settings.db.products;
+      fetch(url)
+        .then(function(rawResponse){
+          return rawResponse.json();
+        })
+        .then(function(parsedResponse){
+          console.log('parsedResponse', parsedResponse);
+
+          /* save parsedResponse as thisApp.data.products */
+          parsedResponse = thisApp.data.products;
+          /* execute initMenu method */
+          thisApp.initMenu();
+
+        });
+      console.log('thisApp.data', JSON.stringify(thisApp.data));
     },
 
     initCart: function(){
@@ -517,7 +543,7 @@
       console.log('templates:', templates);
 
       thisApp.initData();
-      thisApp.initMenu();
+      // thisApp.initMenu();    API
       thisApp.initCart();
 
     },
