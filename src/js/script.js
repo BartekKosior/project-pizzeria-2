@@ -249,7 +249,7 @@
       productSummary.amount = thisProduct.amount;           
       productSummary.priceSingle = thisProduct.priceSingle; 
       productSummary.price = thisProduct.price * thisProduct.amount;    //cena całkowita, czyli c.j. pomnożona przez ilość sztuk 
-      productSummary.params = thisProduct.prepareCartProductParams();             // () w\laczaja funkcje  // jako wartość params prepareCartProduct ustawia to, co zwraca metoda prepareCartProductParams
+      productSummary.params = thisProduct.prepareCartProductParams();   // () w\laczaja funkcje  // jako wartość params prepareCartProduct ustawia to, co zwraca metoda prepareCartProductParams
       return productSummary;                                            //zwrócenie całego obiektu
     }
 
@@ -356,6 +356,8 @@
       thisCart.dom.totalPrice = thisCart.dom.wrapper.querySelectorAll(select.cart.totalPrice);
       thisCart.dom.totalNumber = thisCart.dom.wrapper.querySelector(select.cart.totalNumber);
       thisCart.dom.form = thisCart.dom.wrapper.querySelector(select.cart.form);
+      thisCart.dom.phone = thisCart.dom.wrapper.querySelector(select.cart.phone);
+      thisCart.dom.address = thisCart.dom.wrapper.querySelector(select.cart.address);
     }
 
     initActions(){
@@ -371,6 +373,7 @@
       });
       thisCart.dom.form.addEventListener('submit', function(event){
         event.preventDefault();
+        thisCart.sendOrder();
       });
     }
 
@@ -431,6 +434,33 @@
       thisCart.update();
 
     }
+
+    sendOrder(){
+      const thisCart = this;
+      const url = settings.db.url + '/' + settings.db.orders;
+      thisCart.payload = {
+        address: thisCart.address,   // .value
+        phone: thisCart.phone,       // .value
+        totalPrice: thisCart.totalPrice,
+        subTotalPrice: thisCart.subTotalPrice,
+        totalNumber: thisCart.totalNumber,
+        deliveryFee: thisCart.deliveryFee,
+        products: thisCart.products,
+      }; 
+      const payload = [];
+      for(let prod of thisCart.products) {
+        payload.products.push(prod.getData());
+      }
+      const options = {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),   //przekonwertowanie obiektu payload na ciąg znaków w formacie JSON
+      };
+      fetch(url, options);
+    }
+
   }
 
   // Pojedyńczy produkt w koszyku:
@@ -490,7 +520,19 @@
         thisCartProduct.remove();   //wywołanie metody
       });
     }
-  
+    
+    //metoda zwraca obiekt, który posiada właściwości z instancji thisCartProduct, które będą potrzebne w momencie zapisywania zamówienia: id, amount, price, priceSingle, name i params.
+    getData(){                              
+      const thisCartProduct = this;
+      thisCartProduct.data = {
+        id: thisCartProduct.id,
+        amount: thisCartProduct.amount,
+        price: thisCartProduct.price,
+        priceSingle: thisCartProduct.priceSingle,
+        name: thisCartProduct.name,
+        params: thisCartProduct.params,
+      };
+    }
 
   }
 
@@ -520,7 +562,7 @@
           console.log('parsedResponse', parsedResponse);
 
           /* save parsedResponse as thisApp.data.products */
-          parsedResponse = thisApp.data.products;
+          thisApp.data.products = parsedResponse;
           /* execute initMenu method */
           thisApp.initMenu();
 
