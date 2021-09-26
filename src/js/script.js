@@ -447,7 +447,9 @@
         deliveryFee: thisCart.deliveryFee,
         products: thisCart.products,
       }; 
-      const payload = [];
+      const payload = {
+        products: []
+      };
       for(let prod of thisCart.products) {
         payload.products.push(prod.getData());
       }
