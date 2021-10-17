@@ -1,6 +1,6 @@
 // Cały koszyk:
 import {settings, select, classNames, templates} from './settings.js';
-import utils from './components/utils.js';
+import utils from './utils.js';
 import CartProduct from './cartProduct.js';
 
 
