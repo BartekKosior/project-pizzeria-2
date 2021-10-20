@@ -1,5 +1,5 @@
-import {select} from './settings.js';
-import amountWidget from './components/amountWidget.js';
+import {select} from '../settings.js';
+import amountWidget from './amountWidget.js';
 
 // Pojedyńczy produkt w koszyku:
 class CartProduct{

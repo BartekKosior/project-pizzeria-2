@@ -1,6 +1,6 @@
 // Cały koszyk:
-import {settings, select, classNames, templates} from './settings.js';
-import utils from './utils.js';
+import {settings, select, classNames, templates} from '../settings.js';
+import utils from '../utils.js';
 import CartProduct from './cartProduct.js';
 
 
@@ -30,7 +30,7 @@ class Cart{
 
   initActions(){
     const thisCart = this;
-    thisCart.dom.toggleTrigger.addEventListener('click', function() {
+    thisCart.dom.toggleTrigger.addEventListener('click', function(){
       thisCart.dom.wrapper.classList.toggle(classNames.cart.wrapperActive);      // zwijanie i rozwijanie koszyka
     });
     thisCart.dom.productList.addEventListener('updated', function(){
@@ -105,7 +105,8 @@ class Cart{
   sendOrder(){
     const thisCart = this;
     const url = settings.db.url + '/' + settings.db.orders;
-    thisCart.payload = {       address: thisCart.address,   // .value
+    thisCart.payload = {       
+      address: thisCart.address,   // .value
       phone: thisCart.phone,       // .value
       totalPrice: thisCart.totalPrice,
       subTotalPrice: thisCart.subTotalPrice,
@@ -128,7 +129,6 @@ class Cart{
     };
     fetch(url, options);
   }
-
 }
 
 export default Cart;

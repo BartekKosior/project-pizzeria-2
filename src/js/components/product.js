@@ -1,6 +1,6 @@
-import {select, templates, classNames} from './settings.js';
-import utils from './utils.js';
-import amountWidget from './components/amountWidget.js'; 
+import {select, templates, classNames} from '../settings.js';
+import utils from '../utils.js';
+import amountWidget from './amountWidget.js'; 
 
 class Product{
   constructor(id, data){
@@ -14,9 +14,9 @@ class Product{
     thisProduct.initOrderForm();
     thisProduct.initAmountWidget(); // czemu przed processOrder ?????????
     thisProduct.processOrder();
-
     console.log('new Product:', thisProduct);
   }
+  
   renderInMenu(){
     const thisProduct = this;
     /* generate HTML based on template */   /* wygenerować kod HTML pojedynczego produktu */

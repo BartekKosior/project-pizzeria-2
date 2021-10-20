@@ -1,7 +1,7 @@
 import {settings, select, classNames, templates} from './settings.js';     //  ./ - musi być
 import Product from './components/product.js';   // importowanie domyslne
 import Cart from './components/cart.js';
-
+import Booking from './components/booking.js';
 
 const app = {
   initPages: function(){
@@ -12,7 +12,6 @@ const app = {
     
     const idFromHash = window.location.hash.replace('#/', '');
     // console.log('idFromHash', idFromHash);
-    
     let pageMatchingHash = thisApp.pages[0].id;
     for(let page of thisApp.pages){
       if(page.id == idFromHash){
@@ -22,7 +21,7 @@ const app = {
     }
         
     // po otwarciu strony aktywuje się pierwsza z podstron:
-    thisApp.activatePage(idFromHash);  // thisApp.pages[0].id      0 - pierwsza ze znalezionych stron (order lub booking) 
+    thisApp.activatePage(pageMatchingHash);  // thisApp.pages[0].id      0 - pierwsza ze znalezionych stron (order lub booking) 
         
     for(let link of thisApp.navLinks){
       link.addEventListener('click', function(event){
@@ -37,12 +36,13 @@ const app = {
       });
     } 
   },
+
   activatePage: function(pageId){     // aktywowanie podstrony
     const thisApp = this;
     /* add class "active" to matching pages, remove from non-matching */
     for (let page of thisApp.pages){
       //if(page.id == pageId){
-      //  page.classList.add(classNames.pages.active);
+      //  p/age.classList.add(classNames.pages.active);
       //} else {
       //  page.classList.remove(classNames.pages.active);
       //}
@@ -56,7 +56,6 @@ const app = {
         link.getAttribute('href') == '#' + pageId   // w HTML - <a href="#order">Order</a>
       );
     }
-
   },
 
   initMenu: function(){                                                 /* metoda app.initMenu */
@@ -101,7 +100,17 @@ const app = {
       app.cart.add(event.detail.product);
     });
   },
-    
+  
+  initBooking: function(){
+    const thisApp = this;
+    const booking = document.querySelector(select.containerOf.booking);
+    thisApp.booking = new Booking(booking);
+
+
+
+  },
+
+
   init: function(){
     const thisApp = this;
     console.log('*** App starting ***');
@@ -111,8 +120,10 @@ const app = {
     console.log('templates:', templates);
     thisApp.initPages();
     thisApp.initData();
-    // thisApp.initMenu();    API
+    thisApp.initMenu();
     thisApp.initCart();
+    thisApp.initBooking();
   },
+
 };
 app.init();
