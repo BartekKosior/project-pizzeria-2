@@ -1,44 +1,46 @@
 import {settings, select} from '../settings.js';
+import BaseWidget from './BaseWidget.js';
 
-
-class amountWidget{
+class amountWidget extends BaseWidget{  // rozszerzenie klasy BaseWidget 
   constructor(element){
+    super(element, settings.amountWidget.defaultValue); // odwo\lanie do konstruktora klasy nadrzędnej ; Super - oznacza konstruktora klasy BaseWidget 
     const thisWidget = this;
-    console.log('AmountWidget:', thisWidget);
-    console.log('constructor arguments:', element);
+    //console.log('AmountWidget:', thisWidget);
+    //console.log('constructor arguments:', element);
     thisWidget.getElements(element);
-    thisWidget.setValue(thisWidget.input.value || settings.amountWidget.defaultValue); // wartość startowa ..... albo ......
+    // thisWidget.setValue(thisWidget.input.value || settings.amountWidget.defaultValue); // wartość startowa ..... albo ......
     thisWidget.initActions();
   }
 
-  getElements(element){
+  getElements(/*element*/){
     const thisWidget = this;
-    thisWidget.element = element;
-    thisWidget.input = thisWidget.element.querySelector(select.widgets.amount.input);
-    thisWidget.linkDecrease = thisWidget.element.querySelector(select.widgets.amount.linkDecrease);
-    thisWidget.linkIncrease = thisWidget.element.querySelector(select.widgets.amount.linkIncrease);
+    // thisWidget.element = element; - tym zajmuje sie teraz klasa Base Widget
+    thisWidget.dom.input = /*thisWidget.element*/thisWidget.dom.wrapper.querySelector(select.widgets.amount.input);
+    thisWidget.dom.linkDecrease = /*thisWidget.element*/thisWidget.dom.wrapper.querySelector(select.widgets.amount.linkDecrease);
+    thisWidget.dom.linkIncrease = /*thisWidget.element*/thisWidget.dom.wrapper.querySelector(select.widgets.amount.linkIncrease);
   }
+  
+  isValid(value){  // zwraca prawde lub fałsz
+    return !isNaN(value)  // spr czy value nie jest nieliczbą  NaN - not a number  ! - zanegowanie  value-> tekst -> isValid -> fałsz
 
-  setValue(value){
+    && value <= settings.amountWidget.defaultMax 
+    && value >= settings.amountWidget.defaultMin;
+  } 
+
+  renderValue(){  // bierząca wartość widgetu będzie wyświetlona na stronie
     const thisWidget = this;
-    const newValue = parseInt(value);    //konwertowanie tekstu do liczby. Każdy input daje tekst
-    /* TODO: Add validation */
-    if(thisWidget.value !== newValue && !isNaN(newValue) && newValue <= settings.amountWidget.defaultMax && newValue >= settings.amountWidget.defaultMin) { // czemu wykrzyknik????????  (!isNaN) // !== różne wartości i typy danych ; czy wartość, która przychodzi do funkcji, jest inna niż ta, która jest już aktualnie w thisWidget.value i czy nie jest nullem - tekstem
-      thisWidget.value = newValue;                 // thisWidget.value zmieni się tylko wtedy, jeśli nowa wpisana w input wartość będzie inna niż obecna.
-    }
-    thisWidget.input.value = thisWidget.value;
-    thisWidget.announce();
+    thisWidget.dom.input.value = thisWidget.value;
   }
 
   initActions(){           
     const thisWidget = this;
-    thisWidget.input.addEventListener('change', function() { thisWidget.setValue(this.value);});
-    thisWidget.linkDecrease.addEventListener('click', function(e) { 
+    thisWidget.dom.input.addEventListener('change', function() { thisWidget.setValue(this.value);});
+    thisWidget.dom.linkDecrease.addEventListener('click', function(e) { 
       e.preventDefault();
       thisWidget.setValue(thisWidget.value - 1);
     });
       
-    thisWidget.linkIncrease.addEventListener('click', function(e) { 
+    thisWidget.dom.linkIncrease.addEventListener('click', function(e) { 
       e.preventDefault();
       thisWidget.setValue(thisWidget.value + 1);
     });
@@ -50,7 +52,7 @@ class amountWidget{
     const event = new CustomEvent('updated', {
       bubbles: true                            // Z bubbles event będzie emitowany na elemencie, ale również na jego rodzicu, oraz dziadku, itd az do <body>, document i window
     });
-    thisWidget.element.dispatchEvent(event);
+    /*thisWidget.element*/thisWidget.dom.wrapper.dispatchEvent(event);
   }
 }
 

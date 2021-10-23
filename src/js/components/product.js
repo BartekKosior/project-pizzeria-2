@@ -14,7 +14,7 @@ class Product{
     thisProduct.initOrderForm();
     thisProduct.initAmountWidget(); // czemu przed processOrder ?????????
     thisProduct.processOrder();
-    console.log('new Product:', thisProduct);
+    //console.log('new Product:', thisProduct);
   }
   
   renderInMenu(){
@@ -62,7 +62,7 @@ class Product{
     
   initOrderForm(){
     const thisProduct = this;
-    console.log('initOrderForm:');
+    //console.log('initOrderForm:');
 
     thisProduct.form.addEventListener('submit', function(event){
       event.preventDefault();  /* blokowanie wysłanie formularza z przeładowaniem strony */
@@ -84,10 +84,10 @@ class Product{
         
   processOrder(){
     const thisProduct = this;
-    console.log('processOrder:');
+    //console.log('processOrder:');
     // covert form to object structure e.g. { sauce: ['tomato'], toppings: ['olives', 'redPeppers']}  Dostęp do formularza
     const formData = utils.serializeFormToObject(thisProduct.form);
-    console.log('formData', formData);
+    //console.log('formData', formData);
 
     // set price to default price      zapisanie startowej ceny produktu do zmiennej 
     let price = thisProduct.data.price;
@@ -96,12 +96,12 @@ class Product{
     for(let paramId in thisProduct.data.params) {
       // determine param value, e.g. paramId = 'toppings', param = { label: 'Toppings', type: 'checkboxes'... }
       const param = thisProduct.data.params[paramId]; // pętla for..in zwraca tylko nazwę właśc. Ta linijka dba o to, aby dostać się do całego obiektu dost. pod tą właśc.
-      console.log(paramId, param);
+      //console.log(paramId, param);
       // for every option in this category
       for(let optionId in param.options) {
         // determine option value, e.g. optionId = 'olives', option = { label: 'Olives', price: 2, default: true }
         const option = param.options[optionId];    // dostanie się do całego obiektu dost. pod tą właśc.
-        console.log(optionId, option);
+        //console.log(optionId, option);
 
         // check if there is param with a name of paramId in formData and if it includes optionId
           

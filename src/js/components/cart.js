@@ -10,7 +10,7 @@ class Cart{
     thisCart.products = [];
     thisCart.getElements(element);
     thisCart.initActions();
-    console.log('new cart', thisCart);
+    // console.log('new cart', thisCart);
   }
 
   getElements(element){
@@ -47,7 +47,7 @@ class Cart{
 
   add(menuProduct){
     const thisCart = this;
-    console.log('menuProduct', menuProduct);
+    //console.log('menuProduct', menuProduct);
     /* generate HTML based on template */   /* wygenerować kod HTML pojedynczego produktu */
     const generatedHTML = templates.cartProduct(menuProduct);  /* wywołanie metody templates.menuProduct i przekazanie jej danych produktu */
     /* create element using utils.createElementFromHTML */    /* stworzyć element DOM na podstawie tego kodu produktu */
@@ -55,7 +55,7 @@ class Cart{
     const generatedDOM = thisCart.element;
     thisCart.dom.productList.appendChild(generatedDOM);
     thisCart.products.push(new CartProduct(menuProduct, generatedDOM));
-    console.log('thisCart.products', thisCart.products);
+    //console.log('thisCart.products', thisCart.products);
     thisCart.update();
   }
 
@@ -74,10 +74,10 @@ class Cart{
     }
     thisCart.totalPrice = thisCart.subTotalPrice + thisCart.deliveryFee;    // własciwosć thisCart.totalPrice - jej wartoscią jest cena całkowita i koszt dostawy. Własciwosc jest dostepna w całej instancji - stała nie.
               
-    console.log('thisCart.totalNumber', thisCart.totalNumber);
-    console.log('thisCart.subTotalPrice',thisCart.subTotalPrice);
-    console.log('thisCart.totalPrice', thisCart.totalPrice);
-    console.log('thisCart.deliveryFee', thisCart.deliveryFee);
+    //console.log('thisCart.totalNumber', thisCart.totalNumber);
+    //console.log('thisCart.subTotalPrice',thisCart.subTotalPrice);
+    //console.log('thisCart.totalPrice', thisCart.totalPrice);
+    //console.log('thisCart.deliveryFee', thisCart.deliveryFee);
       
     thisCart.dom.subTotalPrice.innerHTML = thisCart.subTotalPrice;
     for(const LM of thisCart.dom.totalPrice){
@@ -92,8 +92,8 @@ class Cart{
     thisCartProduct.dom.wrapper.remove();
     // console.log('thisCartProduct', thisCartProduct);
     // Usunięcie informacji o danym produkcie z tablicy thisCart.products.
-    const thisCartproductsLenght = thisCart.products.lenght;       // odczytanie ilosci elementów
-    console.log('thisCartproductsLenght', thisCartproductsLenght);
+    // const thisCartproductsLenght = thisCart.products.lenght;       // odczytanie ilosci elementów
+    //console.log('thisCartproductsLenght', thisCartproductsLenght);
     const index = thisCart.products.indexOf(thisCartProduct);
     thisCart.products.splice(index, 1);
 
